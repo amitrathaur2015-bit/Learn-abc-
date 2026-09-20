@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.png', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Chhota Scholar - Kids Learning',
         short_name: 'Chhota Scholar',
@@ -19,19 +19,13 @@ export default defineConfig({
         orientation: 'portrait',
         start_url: '/',
         icons: [
-          { src: 'icon-192.png', sizes: '192x192', type: 'image/png+xml', purpose: 'any' },
-          { src: 'icon-192.png', sizes: '192x192', type: 'image/png+xml', purpose: 'maskable' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png+xml', purpose: 'any' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png+xml', purpose: 'maskable' }
+          { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
         ]
       },
       workbox: {
-        // Precache the app shell (already default) and cache Google Fonts at
-        // runtime so the child's core screens still open with no signal
-        // after the first successful load - the brief's "offline support for
-        // suitable basic content". Data that needs a live Supabase (Parent
-        // Area, Admin, premium checks) still requires a connection, which is
-        // the correct behavior for anything security/payment-related.
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
