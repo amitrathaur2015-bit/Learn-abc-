@@ -5,7 +5,7 @@
 const NIGHT_KEY = 'chhota-scholar-night-mode'
 const FONT_KEY = 'chhota-scholar-font-scale'
 
-export const FONT_SCALES = [90, 100, 115, 130] as const
+export const FONT_SCALES = [90, 100, 110, 120] as const
 export type FontScale = (typeof FONT_SCALES)[number]
 
 export function getNightMode(): boolean {
