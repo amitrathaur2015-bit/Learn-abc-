@@ -4,8 +4,8 @@ import { FONT_SCALES, type FontScale, getFontScale, getNightMode, setFontScale, 
 const FONT_LABELS: Record<FontScale, string> = {
   90: 'Small',
   100: 'Normal',
-  115: 'Large',
-  130: 'Extra Large'
+  110: 'Large',
+  120: 'Extra Large'
 }
 
 export default function DisplaySettingsPanel() {
