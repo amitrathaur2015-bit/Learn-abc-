@@ -115,6 +115,7 @@ export default function TracingPage({ subject, charId, onBack, onPickChar }: Pro
           showToolbar
           clipPaths={template.strokes.map((s) => s.d)}
           clipWidth={30}
+          lockSize={44}
         />
       </div>
 
