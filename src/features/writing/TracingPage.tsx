@@ -103,7 +103,14 @@ export default function TracingPage({ subject, charId, onBack, onPickChar }: Pro
       </div>
 
       <div className={`relative rounded-3xl ${nudge ? 'animate-wiggle' : ''}`}>
-        <WritingBoard key={charId} ref={boardRef} guide={guideNode} showToolbar />
+        <WritingBoard
+  key={charId}
+  ref={boardRef}
+  guide={guideNode}
+  showToolbar
+  clipPaths={template.strokes.map((s) => s.d)}
+  clipWidth={30}
+/>
       </div>
 
       <button
