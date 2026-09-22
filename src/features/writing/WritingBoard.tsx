@@ -37,13 +37,22 @@ interface Props {
   showToolbar?: boolean
   /** Optional guide (e.g. <TracingGuide />) rendered underneath the canvas. */
   guide?: ReactNode
+  /** SVG path "d" strings the child's ink must stay inside - e.g. the letter
+   *  shape. When set, anything drawn outside these shapes is invisible, so
+   *  it's impossible for the line to spill outside the letter no matter how
+   *  the finger moves - a "color inside the letter" feel instead of a strict
+   *  line-following one. */
+  clipPaths?: string[]
+  /** How thick the clip area is (should match the guide's visual shape width). */
+  clipWidth?: number
 }
 
 const WritingBoard = forwardRef<WritingBoardHandle, Props>(function WritingBoard(
-  { onStrokeEnd, showToolbar = true, guide },
+  { onStrokeEnd, showToolbar = true, guide, clipPaths, clipWidth = 26 },
   ref
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const maskCanvasRef = useRef<HTMLCanvasElement | null>(null)
   const [strokes, setStrokes] = useState<Stroke[]>([])
   const [redoStack, setRedoStack] = useState<Stroke[]>([])
   const [color, setColor] = useState(PEN_COLORS[0].value)
@@ -51,6 +60,30 @@ const WritingBoard = forwardRef<WritingBoardHandle, Props>(function WritingBoard
   const [eraser, setEraser] = useState(false)
   const drawing = useRef(false)
   const current = useRef<Stroke | null>(null)
+
+  // Build the (offscreen, never rendered) clip mask once for this board -
+  // a solid copy of the letter shape used to hide any ink outside it.
+  useEffect(() => {
+    if (!clipPaths || clipPaths.length === 0) {
+      maskCanvasRef.current = null
+      return
+    }
+    const mask = document.createElement('canvas')
+    mask.width = GRID
+    mask.height = GRID
+    const mctx = mask.getContext('2d')
+    if (mctx) {
+      mctx.lineCap = 'round'
+      mctx.lineJoin = 'round'
+      mctx.strokeStyle = '#000000'
+      mctx.lineWidth = clipWidth
+      for (const d of clipPaths) {
+        mctx.stroke(new Path2D(d))
+      }
+    }
+    maskCanvasRef.current = mask
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const redraw = useCallback((all: Stroke[]) => {
     const canvas = canvasRef.current
@@ -71,6 +104,15 @@ const WritingBoard = forwardRef<WritingBoardHandle, Props>(function WritingBoard
       ctx.stroke()
     }
     ctx.globalCompositeOperation = 'source-over'
+
+    // Clip: erase any ink that falls outside the letter shape, so the child
+    // can move their finger however they like - only the part inside the
+    // letter ever stays visible.
+    if (maskCanvasRef.current) {
+      ctx.globalCompositeOperation = 'destination-in'
+      ctx.drawImage(maskCanvasRef.current, 0, 0)
+      ctx.globalCompositeOperation = 'source-over'
+    }
   }, [])
 
   useEffect(() => {
