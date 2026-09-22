@@ -3,6 +3,7 @@ import type { Point } from '../../types/tracing'
 import { findTemplate, getTemplates } from '../../data/tracingTemplates'
 import WritingBoard, { type WritingBoardHandle } from './WritingBoard'
 import TracingGuide from './TracingGuide'
+import CharacterPreview from './CharacterPreview'
 import { samplePath, scoreTrace, randomEncouragement } from './traceMath'
 import { recordWritingCompletion, type BadgeUnlock } from '../../services/progressService'
 import BadgeToast from '../../components/BadgeToast'
@@ -102,15 +103,19 @@ export default function TracingPage({ subject, charId, onBack, onPickChar }: Pro
         <p className="text-sm text-ink/60">Move your finger inside the shape</p>
       </div>
 
+      <div className="mx-auto mb-3 h-24 w-24 rounded-2xl bg-white p-2 shadow-sticker">
+        <CharacterPreview template={template} />
+      </div>
+
       <div className={`relative rounded-3xl ${nudge ? 'animate-wiggle' : ''}`}>
         <WritingBoard
-  key={charId}
-  ref={boardRef}
-  guide={guideNode}
-  showToolbar
-  clipPaths={template.strokes.map((s) => s.d)}
-  clipWidth={30}
-/>
+          key={charId}
+          ref={boardRef}
+          guide={guideNode}
+          showToolbar
+          clipPaths={template.strokes.map((s) => s.d)}
+          clipWidth={30}
+        />
       </div>
 
       <button
