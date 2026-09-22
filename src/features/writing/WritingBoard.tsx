@@ -45,10 +45,15 @@ interface Props {
   clipPaths?: string[]
   /** How thick the clip area is (should match the guide's visual shape width). */
   clipWidth?: number
+  /** When set, the brush is a big fixed "fill" size and the S/M/L size
+   *  picker is hidden - a small back-and-forth finger motion fills a large
+   *  area at once, combined with clipPaths this makes coloring a whole
+   *  letter fast and forgiving instead of needing to precisely trace it. */
+  lockSize?: number
 }
 
 const WritingBoard = forwardRef<WritingBoardHandle, Props>(function WritingBoard(
-  { onStrokeEnd, showToolbar = true, guide, clipPaths, clipWidth = 26 },
+  { onStrokeEnd, showToolbar = true, guide, clipPaths, clipWidth = 26, lockSize },
   ref
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -56,7 +61,7 @@ const WritingBoard = forwardRef<WritingBoardHandle, Props>(function WritingBoard
   const [strokes, setStrokes] = useState<Stroke[]>([])
   const [redoStack, setRedoStack] = useState<Stroke[]>([])
   const [color, setColor] = useState(PEN_COLORS[0].value)
-  const [size, setSize] = useState(PEN_SIZES[1].value)
+  const [size, setSize] = useState(lockSize ?? PEN_SIZES[1].value)
   const [eraser, setEraser] = useState(false)
   const drawing = useRef(false)
   const current = useRef<Stroke | null>(null)
@@ -220,20 +225,23 @@ const WritingBoard = forwardRef<WritingBoardHandle, Props>(function WritingBoard
             />
           ))}
 
-          <span className="mx-1 h-6 w-px bg-ink/15" />
-
-          {PEN_SIZES.map((s) => (
-            <button
-              key={s.value}
-              aria-label={`Pen size ${s.name}`}
-              onClick={() => setSize(s.value)}
-              className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold font-display ${
-                size === s.value ? 'bg-ink text-white' : 'bg-white text-ink'
-              }`}
-            >
-              {s.name}
-            </button>
-          ))}
+          {lockSize === undefined && (
+            <>
+              <span className="mx-1 h-6 w-px bg-ink/15" />
+              {PEN_SIZES.map((s) => (
+                <button
+                  key={s.value}
+                  aria-label={`Pen size ${s.name}`}
+                  onClick={() => setSize(s.value)}
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold font-display ${
+                    size === s.value ? 'bg-ink text-white' : 'bg-white text-ink'
+                  }`}
+                >
+                  {s.name}
+                </button>
+              ))}
+            </>
+          )}
 
           <span className="mx-1 h-6 w-px bg-ink/15" />
 
