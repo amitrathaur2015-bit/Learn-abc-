@@ -15,10 +15,9 @@ export default function TracingGuide({ template, registerPath }: Props) {
       <line x1="20" y1="240" x2="280" y2="240" stroke="#2B2140" strokeOpacity="0.14" strokeWidth="2" />
 
       {/* black outline (drawn first, slightly thicker, sits behind the color) */}
-      {template.strokes.map((stroke, i) => (
+      {template.strokes.map((stroke) => (
         <path
           key={`${stroke.id}-outline`}
-          ref={i === 0 ? undefined : undefined}
           d={stroke.d}
           fill="none"
           stroke="#2B2140"
