@@ -1,6 +1,11 @@
 import ScreenHeader from '../../components/ScreenHeader'
 import { GK_TOPICS, GK_QUIZ_TOPICS } from '../../data/gkContent'
 import { speak } from '../../services/audioService'
+import GkFlashcards from './GkFlashcards'
+
+// These topics get the big "flashcard that introduces itself" view -
+// everything else keeps the browsable grid.
+const FLASHCARD_TOPICS = new Set(['animals', 'fruits', 'vegetables', 'body'])
 
 interface Props {
   topicId: string
@@ -12,6 +17,10 @@ export default function GkTopicPage({ topicId, onBack, onPlayQuiz }: Props) {
   const topic = GK_TOPICS.find((t) => t.id === topicId)
   if (!topic) return null
   const hasQuiz = GK_QUIZ_TOPICS.has(topicId)
+
+  if (FLASHCARD_TOPICS.has(topicId)) {
+    return <GkFlashcards topic={topic} onBack={onBack} onPlayQuiz={hasQuiz ? () => onPlayQuiz(topicId) : undefined} />
+  }
 
   return (
     <div className="mx-auto min-h-screen max-w-md px-4 pb-10 pt-6">
