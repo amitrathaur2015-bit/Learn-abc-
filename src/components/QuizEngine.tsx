@@ -1,25 +1,59 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { QuizQuestion } from '../data/models'
 import { recordQuizAnswer, recordQuizFinished, type BadgeUnlock } from '../services/progressService'
 import BadgeToast from './BadgeToast'
+import { getQuizQuestionsOverride } from '../services/contentOverrideService'
+import { isSupabaseConfigured } from '../lib/supabaseClient'
 
 interface Props {
   title: string
   questions: QuizQuestion[]
   onFinish: () => void
+  /** If set, checks for an admin-authored published quiz with this slug
+   *  first, and uses its questions instead of `questions` when one exists.
+   *  Falls back to `questions` otherwise - always safe to add. */
+  slug?: string
 }
 
 const RIGHT_MESSAGES = ['Great job! ⭐', 'Excellent! 🎉', 'Superstar! 🌟', 'Well done! 🎈']
 const WRONG_MESSAGES = ['Almost there! 😊', 'Try again 😊', "Let's see the answer 🙂"]
 
-export default function QuizEngine({ title, questions, onFinish }: Props) {
+export default function QuizEngine({ title, questions, onFinish, slug }: Props) {
+  const [activeQuestions, setActiveQuestions] = useState<QuizQuestion[]>(questions)
+  const [resolving, setResolving] = useState(Boolean(slug) && isSupabaseConfigured)
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState<string | null>(null)
   const [score, setScore] = useState(0)
   const [unlock, setUnlock] = useState<BadgeUnlock | null>(null)
   const [done, setDone] = useState(false)
 
-  const q = questions[index]
+  useEffect(() => {
+    if (!slug || !isSupabaseConfigured) {
+      setActiveQuestions(questions)
+      setResolving(false)
+      return
+    }
+    let cancelled = false
+    getQuizQuestionsOverride(slug).then((override) => {
+      if (cancelled) return
+      setActiveQuestions(override && override.length > 0 ? override : questions)
+      setResolving(false)
+    })
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug])
+
+  if (resolving) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <span className="animate-pulse text-4xl">✨</span>
+      </div>
+    )
+  }
+
+  const q = activeQuestions[index]
 
   const choose = async (optionId: string) => {
     if (selected) return
@@ -31,7 +65,7 @@ export default function QuizEngine({ title, questions, onFinish }: Props) {
   }
 
   const next = async () => {
-    if (index + 1 < questions.length) {
+    if (index + 1 < activeQuestions.length) {
       setIndex((i) => i + 1)
       setSelected(null)
     } else {
@@ -46,7 +80,7 @@ export default function QuizEngine({ title, questions, onFinish }: Props) {
         <div className="text-6xl">🎉</div>
         <h2 className="mt-3 font-display text-2xl font-extrabold text-ink">Well done!</h2>
         <p className="mt-1 text-ink/60">
-          You got {score} out of {questions.length} right.
+          You got {score} out of {activeQuestions.length} right.
         </p>
         <button
           onClick={onFinish}
@@ -62,7 +96,7 @@ export default function QuizEngine({ title, questions, onFinish }: Props) {
   return (
     <div className="mx-auto min-h-screen max-w-md px-4 pb-10 pt-6">
       <p className="text-center text-sm font-bold uppercase tracking-wide text-ink/40">
-        {title} · {index + 1}/{questions.length}
+        {title} · {index + 1}/{activeQuestions.length}
       </p>
       <h2 className="mt-2 text-center font-display text-xl font-extrabold text-ink">{q.prompt}</h2>
 
@@ -102,7 +136,7 @@ export default function QuizEngine({ title, questions, onFinish }: Props) {
             onClick={next}
             className="mt-3 rounded-2xl bg-grape px-6 py-3 font-display font-extrabold text-white shadow-sticker"
           >
-            {index + 1 < questions.length ? 'Next →' : 'Finish 🎉'}
+            {index + 1 < activeQuestions.length ? 'Next →' : 'Finish 🎉'}
           </button>
         </div>
       )}
