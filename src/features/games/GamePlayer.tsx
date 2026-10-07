@@ -36,5 +36,5 @@ export default function GamePlayer({ gameId, onBack }: Props) {
       ? makeMissingNumberQuestions()
       : makeGeneralQuizQuestions()
 
-  return <QuizEngine title={game.title} questions={questions} onFinish={onBack} />
+  return <QuizEngine title={game.title} questions={questions} onFinish={onBack} slug={`game-${game.id}`} />
 }
