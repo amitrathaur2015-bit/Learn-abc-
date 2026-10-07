@@ -153,7 +153,7 @@ export default function App() {
     case 'english-class1':
       return (
         <UsageGate activityType="quiz" onBlocked={() => setScreen({ name: 'english-hub' })} onGoPricing={() => setScreen({ name: 'pricing' })}>
-          <QuizEngine title="Class 1 Practice" questions={CLASS1_QUESTIONS} onFinish={() => setScreen({ name: 'english-hub' })} />
+          <QuizEngine title="Class 1 Practice" questions={CLASS1_QUESTIONS} onFinish={() => setScreen({ name: 'english-hub' })} slug="class1" />
         </UsageGate>
       )
 
@@ -185,7 +185,7 @@ export default function App() {
       const gen = generators[screen.topicId] ?? makeCountingQuestions
       return (
         <UsageGate activityType="quiz" onBlocked={() => setScreen({ name: 'maths-hub' })} onGoPricing={() => setScreen({ name: 'pricing' })}>
-          <QuizEngine title="Maths" questions={gen()} onFinish={() => setScreen({ name: 'maths-hub' })} />
+          <QuizEngine title="Maths" questions={gen()} onFinish={() => setScreen({ name: 'maths-hub' })} slug={`maths-${screen.topicId}`} />
         </UsageGate>
       )
     }
@@ -200,6 +200,7 @@ export default function App() {
             title={screen.kind === 'colors' ? 'Find the Color' : 'Find the Shape'}
             questions={screen.kind === 'colors' ? makeColorQuestions() : makeShapeQuestions()}
             onFinish={() => setScreen({ name: 'colors-shapes-hub' })}
+            slug={`colors-${screen.kind}`}
           />
         </UsageGate>
       )
@@ -218,7 +219,7 @@ export default function App() {
     case 'gk-quiz':
       return (
         <UsageGate activityType="quiz" onBlocked={() => setScreen({ name: 'gk-topic', topicId: screen.topicId })} onGoPricing={() => setScreen({ name: 'pricing' })}>
-          <QuizEngine title="GK Quiz" questions={makeGkQuiz(screen.topicId)} onFinish={() => setScreen({ name: 'gk-topic', topicId: screen.topicId })} />
+          <QuizEngine title="GK Quiz" questions={makeGkQuiz(screen.topicId)} onFinish={() => setScreen({ name: 'gk-topic', topicId: screen.topicId })} slug={`gk-${screen.topicId}`} />
         </UsageGate>
       )
 
