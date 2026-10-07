@@ -124,9 +124,13 @@ export async function listQuizzes(): Promise<{ id: string; title: string }[]> {
   return data ?? []
 }
 
-export async function createQuiz(title: string): Promise<{ id: string } | null> {
+export async function createQuiz(title: string, slug?: string): Promise<{ id: string } | null> {
   if (!isSupabaseConfigured) return null
-  const { data, error } = await supabase.from('quizzes').insert({ title, is_published: true }).select('id').single()
+  const { data, error } = await supabase
+    .from('quizzes')
+    .insert({ title, slug: slug || null, is_published: true })
+    .select('id')
+    .single()
   if (error) return null
   return data
 }
