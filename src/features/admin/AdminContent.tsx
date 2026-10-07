@@ -61,9 +61,9 @@ export default function AdminContent() {
       {section === 'writing' && <WritingTemplatesManager />}
       {section === 'games' && <GamesManager />}
       <p className="mt-6 text-center text-xs text-ink/40">
-        Note: these forms save real, RLS-protected rows in Supabase. The child-facing screens still read the built-in
-        English/Hindi/Maths/GK content and games (src/data/*.ts) rather than these tables yet - wiring that read is the next
-        step so new content shows up live. See the README for details.
+        Note: these forms save real, RLS-protected rows in Supabase. Lessons, Writing Templates and Games still need the
+        child-facing screens wired up to read from these tables - Quiz Questions already work live when you give a quiz
+        the right slug. See the README for details.
       </p>
     </div>
   )
@@ -163,6 +163,7 @@ function QuizManager() {
   const [activeQuiz, setActiveQuiz] = useState<string | null>(null)
   const [questions, setQuestions] = useState<AdminQuizQuestion[]>([])
   const [newQuizTitle, setNewQuizTitle] = useState('')
+  const [newQuizSlug, setNewQuizSlug] = useState('')
   const [form, setForm] = useState<{ prompt: string; a: string; b: string; c: string; correct: 'a' | 'b' | 'c' }>({
     prompt: '',
     a: '',
@@ -181,11 +182,12 @@ function QuizManager() {
 
   const addQuiz = async () => {
     if (!newQuizTitle.trim()) return
-    const q = await createQuiz(newQuizTitle.trim())
+    const q = await createQuiz(newQuizTitle.trim(), newQuizSlug.trim() || undefined)
     if (q) {
       setQuizzes((prev) => [...prev, { id: q.id, title: newQuizTitle }])
       setActiveQuiz(q.id)
       setNewQuizTitle('')
+      setNewQuizSlug('')
     }
   }
 
@@ -207,16 +209,29 @@ function QuizManager() {
 
   return (
     <div>
-      <div className="mb-3 flex gap-2">
+      <div className="mb-3 flex flex-col gap-2">
         <input
           placeholder="New quiz title"
           value={newQuizTitle}
           onChange={(e) => setNewQuizTitle(e.target.value)}
-          className="flex-1 rounded-2xl bg-white px-3 py-2 shadow-inner"
+          className="rounded-2xl bg-white px-3 py-2 shadow-inner"
         />
-        <button onClick={addQuiz} className="rounded-2xl bg-leaf px-4 py-2 font-display font-bold text-white">
-          Add
-        </button>
+        <div className="flex gap-2">
+          <input
+            placeholder="Slug (e.g. class1, maths-counting, gk-animals)"
+            value={newQuizSlug}
+            onChange={(e) => setNewQuizSlug(e.target.value)}
+            className="flex-1 rounded-2xl bg-white px-3 py-2 text-sm shadow-inner"
+          />
+          <button onClick={addQuiz} className="rounded-2xl bg-leaf px-4 py-2 font-display font-bold text-white">
+            Add
+          </button>
+        </div>
+        <p className="text-xs text-ink/40">
+          The slug must exactly match one of: class1, maths-counting, maths-before-after, maths-compare,
+          maths-addition, colors-colors, colors-shapes, gk-animals, gk-fruits, game-letter-picture, game-number-match,
+          game-correct-word, game-correct-letter, game-missing-number, game-general-quiz
+        </p>
       </div>
 
       <div className="mb-3 flex flex-wrap gap-2">
