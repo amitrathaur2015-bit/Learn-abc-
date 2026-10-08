@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
-import type { QuizQuestion } from '../data/models'
+import type { QuizQuestion, GameConfig } from '../data/models'
 
 /** Looks for a published admin-authored quiz with this slug and returns its
  *  questions, or null if none exists / nothing is configured yet - callers
@@ -32,4 +32,30 @@ export async function getQuizQuestionsOverride(slug: string): Promise<QuizQuesti
   } catch {
     return null
   }
+}
+
+// Remembers the last list of admin games the Games hub loaded, so the game
+// screen can look up a game's title/engine without fetching again.
+let cachedGames: GameConfig[] = []
+
+/** Published games created in the Admin Panel (empty if none / not configured). */
+export async function getPublishedGames(): Promise<GameConfig[]> {
+  if (!isSupabaseConfigured) return []
+  try {
+    const { data } = await supabase.from('games').select('*').eq('is_published', true).order('title')
+    cachedGames = (data ?? []).map((g) => ({
+      id: g.id as string,
+      title: g.title as string,
+      emoji: (g.emoji as string | null) ?? '🎮',
+      engine: g.engine as GameConfig['engine'],
+      description: (g.description as string | null) ?? ''
+    }))
+    return cachedGames
+  } catch {
+    return []
+  }
+}
+
+export function findCachedGame(id: string): GameConfig | undefined {
+  return cachedGames.find((g) => g.id === id)
 }
