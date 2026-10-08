@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react'
 import ScreenHeader from '../../components/ScreenHeader'
 import AdSlot from '../../components/AdSlot'
 import type { GameConfig } from '../../data/models'
+import { getPublishedGames } from '../../services/contentOverrideService'
 
 export const GAMES: GameConfig[] = [
   { id: 'letter-picture', title: 'Letter-Picture Match', emoji: '🔤', engine: 'match', description: 'Match each letter to its picture' },
@@ -14,11 +16,28 @@ export const GAMES: GameConfig[] = [
 ]
 
 export default function GamesHub({ onBack, onPlay }: { onBack: () => void; onPlay: (id: string) => void }) {
+  const [games, setGames] = useState<GameConfig[]>(GAMES)
+
+  // Built-in games always show. Any published game made in the Admin Panel
+  // is added after them (a same-id admin game just updates the title/emoji).
+  useEffect(() => {
+    let cancelled = false
+    getPublishedGames().then((extra) => {
+      if (cancelled || extra.length === 0) return
+      const merged = new Map(GAMES.map((g) => [g.id, g]))
+      extra.forEach((g) => merged.set(g.id, g))
+      setGames(Array.from(merged.values()))
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   return (
     <div className="mx-auto min-h-screen max-w-md px-4 pb-10 pt-6">
       <ScreenHeader title="🎮 Learning Games" subtitle="Short, fun and educational" onBack={onBack} />
       <div className="flex flex-col gap-3">
-        {GAMES.map((g) => (
+        {games.map((g) => (
           <button
             key={g.id}
             onClick={() => onPlay(g.id)}
