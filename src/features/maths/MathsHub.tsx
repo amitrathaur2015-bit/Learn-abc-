@@ -1,5 +1,6 @@
 import ScreenHeader from '../../components/ScreenHeader'
 import AdSlot from '../../components/AdSlot'
+import LessonsList from '../lessons/LessonsList'
 import { MATHS_TOPICS } from '../../data/mathsContent'
 
 interface Props {
@@ -17,7 +18,7 @@ export default function MathsHub({ onBack, onOpen }: Props) {
             key={t.id}
             onClick={() => t.ready && onOpen(t.id)}
             className={`sticker-card flex items-center gap-3 rounded-3xl bg-white px-5 py-4 text-left ${
-              !t.ready && 'opacity-50'
+              !t.ready ? 'opacity-50' : ''
             }`}
           >
             <span className="text-3xl">{t.emoji}</span>
@@ -26,6 +27,7 @@ export default function MathsHub({ onBack, onOpen }: Props) {
           </button>
         ))}
       </div>
+      <LessonsList subjectId="maths" />
       <AdSlot placement="subject" />
     </div>
   )
