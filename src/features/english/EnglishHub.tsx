@@ -1,6 +1,7 @@
 import ScreenHeader from '../../components/ScreenHeader'
 import StickerCard from '../../components/StickerCard'
 import AdSlot from '../../components/AdSlot'
+import LessonsList from '../lessons/LessonsList'
 
 interface Props {
   onBack: () => void
@@ -16,6 +17,7 @@ export default function EnglishHub({ onBack, onOpen }: Props) {
         <StickerCard title="Simple Words" emoji="📖" color="coral" onClick={() => onOpen('words')} />
         <StickerCard title="Class 1 Practice" emoji="📝" color="grape" onClick={() => onOpen('class1')} />
       </div>
+      <LessonsList subjectId="english" />
       <AdSlot placement="subject" />
     </div>
   )
