@@ -1,6 +1,7 @@
 import ScreenHeader from '../../components/ScreenHeader'
 import StickerCard from '../../components/StickerCard'
 import AdSlot from '../../components/AdSlot'
+import LessonsList from '../lessons/LessonsList'
 
 interface Props {
   onBack: () => void
@@ -18,6 +19,7 @@ export default function HindiHub({ onBack, onOpen }: Props) {
       <p className="mt-6 text-center text-sm text-ink/40">
         Finger-tracing for Hindi letters is coming in the next update - recognition and pronunciation work now! ✨
       </p>
+      <LessonsList subjectId="hindi" />
       <AdSlot placement="subject" />
     </div>
   )
