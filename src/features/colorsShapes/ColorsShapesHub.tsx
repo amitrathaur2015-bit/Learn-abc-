@@ -1,5 +1,6 @@
 import ScreenHeader from '../../components/ScreenHeader'
 import AdSlot from '../../components/AdSlot'
+import LessonsList from '../lessons/LessonsList'
 import { COLORS, SHAPES } from '../../data/colorsShapesContent'
 import { speak } from '../../services/audioService'
 
@@ -56,6 +57,7 @@ export default function ColorsShapesHub({ onBack, onPlayQuiz }: Props) {
       >
         🎯 Play "Find the Shape"
       </button>
+      <LessonsList subjectId="colors-shapes" />
       <AdSlot placement="subject" />
     </div>
   )
