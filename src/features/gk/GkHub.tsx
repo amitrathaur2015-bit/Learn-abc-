@@ -1,5 +1,6 @@
 import ScreenHeader from '../../components/ScreenHeader'
 import AdSlot from '../../components/AdSlot'
+import LessonsList from '../lessons/LessonsList'
 import { GK_TOPICS } from '../../data/gkContent'
 
 interface Props {
@@ -23,6 +24,7 @@ export default function GkHub({ onBack, onOpen }: Props) {
           </button>
         ))}
       </div>
+      <LessonsList subjectId="gk" />
       <AdSlot placement="subject" />
     </div>
   )
