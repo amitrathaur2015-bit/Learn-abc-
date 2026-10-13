@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ScreenHeader from '../../components/ScreenHeader'
 import SpeakerButton from '../../components/SpeakerButton'
 import { ALPHABET } from '../../data/englishContent'
+import { findTemplate } from '../../data/tracingTemplates'
 import type { AlphabetEntry } from '../../data/models'
 import { speak } from '../../services/audioService'
+import { loadAdminTemplates } from '../../services/templateService'
 
 interface Props {
   onBack: () => void
@@ -12,6 +14,17 @@ interface Props {
 
 export default function AlphabetPage({ onBack, onPractice }: Props) {
   const [open, setOpen] = useState<AlphabetEntry | null>(null)
+  const [, setTick] = useState(0)
+
+  useEffect(() => {
+    let cancelled = false
+    loadAdminTemplates().then(() => {
+      if (!cancelled) setTick((t) => t + 1)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <div className="mx-auto min-h-screen max-w-md px-4 pb-10 pt-6">
@@ -48,7 +61,7 @@ export default function AlphabetPage({ onBack, onPractice }: Props) {
               <SpeakerButton text={`${open.letter}, ${open.letter} for ${open.word}`} />
             </div>
             <div className="mt-5 flex flex-col gap-2">
-              {open.hasTracing ? (
+              {open.hasTracing || findTemplate('english', open.letter) ? (
                 <button
                   onClick={() => onPractice(open.letter)}
                   className="rounded-2xl bg-coral py-3 font-display font-extrabold text-white shadow-stickerPress"
