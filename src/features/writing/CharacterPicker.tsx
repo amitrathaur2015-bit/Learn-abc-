@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react'
 import { getTemplates } from '../../data/tracingTemplates'
+import { loadAdminTemplates } from '../../services/templateService'
 
 interface Props {
   subject: 'english' | 'numbers'
@@ -7,6 +9,19 @@ interface Props {
 }
 
 export default function CharacterPicker({ subject, onBack, onPick }: Props) {
+  const [, setTick] = useState(0)
+
+  // Pull in any letters/numbers the admin added, then redraw the list.
+  useEffect(() => {
+    let cancelled = false
+    loadAdminTemplates().then(() => {
+      if (!cancelled) setTick((t) => t + 1)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   const chars = getTemplates(subject)
 
   return (
@@ -39,9 +54,7 @@ export default function CharacterPicker({ subject, onBack, onPick }: Props) {
         ))}
       </div>
 
-      <p className="mt-6 text-center text-sm text-ink/40">
-        More letters and numbers are on the way! ✨
-      </p>
+      <p className="mt-6 text-center text-sm text-ink/40">More letters and numbers are on the way! ✨</p>
     </div>
   )
 }
