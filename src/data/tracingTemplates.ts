@@ -169,8 +169,21 @@ export const numberTemplates: CharacterTemplate[] = [
   }
 ]
 
+// Letters/numbers added from the Admin Panel (loaded by templateService.ts).
+let extraTemplates: CharacterTemplate[] = []
+
+export function setExtraTemplates(list: CharacterTemplate[]) {
+  extraTemplates = list
+}
+
 export function getTemplates(subject: 'english' | 'numbers'): CharacterTemplate[] {
-  return subject === 'english' ? englishTemplates : numberTemplates
+  const base = subject === 'english' ? englishTemplates : numberTemplates
+  const merged = new Map<string, CharacterTemplate>(base.map((t) => [t.id, t]))
+  extraTemplates.filter((t) => t.subject === subject).forEach((t) => merged.set(t.id, t))
+  const list = Array.from(merged.values())
+  return subject === 'numbers'
+    ? list.sort((a, b) => Number(a.id) - Number(b.id))
+    : list.sort((a, b) => a.id.localeCompare(b.id))
 }
 
 export function findTemplate(subject: 'english' | 'numbers', id: string): CharacterTemplate | undefined {
