@@ -23,6 +23,7 @@ import {
   type AdminTracingPath,
   type AdminGame
 } from '../../services/adminDataService'
+import StrokeDrawPad from './StrokeDrawPad'
 
 const SUBJECTS = ['english', 'hindi', 'maths', 'gk', 'colors-shapes']
 
@@ -61,9 +62,8 @@ export default function AdminContent() {
       {section === 'writing' && <WritingTemplatesManager />}
       {section === 'games' && <GamesManager />}
       <p className="mt-6 text-center text-xs text-ink/40">
-        Note: these forms save real, RLS-protected rows in Supabase. Lessons, Writing Templates and Games still need the
-        child-facing screens wired up to read from these tables - Quiz Questions already work live when you give a quiz
-        the right slug. See the README for details.
+        Published Quiz Questions, Lessons, Games and English/Number writing templates show up for children automatically.
+        Hindi writing templates are saved but not shown yet, and the Premium checkbox is not enforced yet.
       </p>
     </div>
   )
@@ -230,7 +230,8 @@ function QuizManager() {
         <p className="text-xs text-ink/40">
           The slug must exactly match one of: class1, maths-counting, maths-before-after, maths-compare,
           maths-addition, colors-colors, colors-shapes, gk-animals, gk-fruits, game-letter-picture, game-number-match,
-          game-correct-word, game-correct-letter, game-missing-number, game-general-quiz
+          game-correct-word, game-correct-letter, game-missing-number, game-general-quiz. For a new game you made
+          in the Games tab, use game- followed by that game's ID (e.g. game-animals-quiz).
         </p>
       </div>
 
@@ -438,6 +439,10 @@ function WritingTemplatesManager() {
                     </button>
                   </div>
                 ))}
+                <StrokeDrawPad
+                  existing={paths.map((p) => p.path_d)}
+                  onDrawn={(d, x, y) => setPathForm({ path_d: d, start_x: x, start_y: y })}
+                />
                 <textarea
                   placeholder="SVG path 'd' string, e.g. M70,240 L150,60 L230,240"
                   value={pathForm.path_d}
@@ -581,8 +586,8 @@ function GamesManager() {
         ))}
       </div>
       <p className="mt-2 text-xs text-ink/40">
-        Note: the child-facing Games hub currently reads from the built-in game list (src/features/games/GamesHub.tsx). Games saved
-        here are stored and RLS-protected, ready for that screen to read from Supabase instead in a later pass.
+        Published games appear in the child's Games hub. For a new game, use engine quiz and add its questions in the
+        Quiz Questions tab with the slug game- followed by this game's ID.
       </p>
     </div>
   )
