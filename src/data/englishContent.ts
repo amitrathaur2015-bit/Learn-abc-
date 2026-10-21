@@ -1,9 +1,9 @@
 import type { AlphabetEntry, WordCard, QuizQuestion } from './models'
 
-// Only A, B, C have a real Writing Practice template today (see
-// tracingTemplates.ts). The rest are flagged hasTracing: false so the UI can
-// honestly show "Writing practice coming soon" instead of a broken link.
-const TRACED = new Set(['A', 'B', 'C'])
+// A-Z have Writing Practice enabled.
+// The corresponding tracing templates must exist in tracingTemplates.ts
+// or moreLetters.ts for each letter's practice page to work correctly.
+const TRACED = new Set('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''))
 
 const WORDS: Record<string, { word: string; emoji: string }> = {
   A: { word: 'Apple', emoji: '🍎' },
@@ -34,11 +34,20 @@ const WORDS: Record<string, { word: string; emoji: string }> = {
   Z: { word: 'Zebra', emoji: '🦓' }
 }
 
-export const ALPHABET: AlphabetEntry[] = Array.from({ length: 26 }, (_, i) => {
-  const letter = String.fromCharCode(65 + i)
-  const w = WORDS[letter]
-  return { letter, word: w.word, emoji: w.emoji, hasTracing: TRACED.has(letter) }
-})
+export const ALPHABET: AlphabetEntry[] = Array.from(
+  { length: 26 },
+  (_, i) => {
+    const letter = String.fromCharCode(65 + i)
+    const w = WORDS[letter]
+
+    return {
+      letter,
+      word: w.word,
+      emoji: w.emoji,
+      hasTracing: TRACED.has(letter)
+    }
+  }
+)
 
 export const SIMPLE_WORDS: WordCard[] = [
   { id: 'apple', word: 'Apple', emoji: '🍎' },
