@@ -27,6 +27,7 @@ export interface CharacterTemplate {
   strokes: StrokeTemplate[]
   /** 1 = easiest. Reserved for future sequencing/unlock logic. */
   difficulty: number
+    strokeWidth?: number
 }
 
 export type TracingLevel = 1 | 2 | 3 | 4 | 5
