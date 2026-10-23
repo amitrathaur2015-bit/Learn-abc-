@@ -1,5 +1,6 @@
 import type { CharacterTemplate } from '../types/tracing'
 import { moreEnglishTemplates } from './moreLetters'
+import { zeroTemplate, getBigNumbers } from './bigNumbers'
 
 // All strokes live on a shared 300x300 grid (matches the SVG viewBox used by
 // TracingGuide and the canvas resolution used by WritingBoard, so a point
@@ -146,8 +147,7 @@ export const numberTemplates: CharacterTemplate[] = [
     id: '8',
     subject: 'numbers',
     label: '8',
-
-difficulty: 3,
+    difficulty: 3,
     strokes: [
       {
         id: '8-1',
@@ -179,10 +179,11 @@ export function setExtraTemplates(list: CharacterTemplate[]) {
 }
 
 export function getTemplates(subject: 'english' | 'numbers'): CharacterTemplate[] {
+  const digits = [zeroTemplate, ...numberTemplates]
   const base =
     subject === 'english'
       ? [...englishTemplates, ...moreEnglishTemplates]
-      : numberTemplates
+      : [...digits, ...getBigNumbers(digits)]
 
   const merged = new Map<string, CharacterTemplate>(base.map((t) => [t.id, t]))
 
