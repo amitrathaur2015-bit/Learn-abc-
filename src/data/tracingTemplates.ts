@@ -1,6 +1,7 @@
 import type { CharacterTemplate } from '../types/tracing'
 import { moreEnglishTemplates } from './moreLetters'
 import { zeroTemplate, getBigNumbers } from './bigNumbers'
+import { hindiTemplates } from './hindiLetters'
 
 // All strokes live on a shared 300x300 grid (matches the SVG viewBox used by
 // TracingGuide and the canvas resolution used by WritingBoard, so a point
@@ -178,29 +179,24 @@ export function setExtraTemplates(list: CharacterTemplate[]) {
   extraTemplates = list
 }
 
-export function getTemplates(subject: 'english' | 'numbers'): CharacterTemplate[] {
+export type TracingSubject = 'english' | 'numbers' | 'hindi'
+
+export function getTemplates(subject: TracingSubject): CharacterTemplate[] {
   const digits = [zeroTemplate, ...numberTemplates]
   const base =
     subject === 'english'
       ? [...englishTemplates, ...moreEnglishTemplates]
+      : subject === 'hindi'
+      ? hindiTemplates
       : [...digits, ...getBigNumbers(digits)]
-
   const merged = new Map<string, CharacterTemplate>(base.map((t) => [t.id, t]))
-
-  extraTemplates
-    .filter((t) => t.subject === subject)
-    .forEach((t) => merged.set(t.id, t))
-
+  extraTemplates.filter((t) => t.subject === subject).forEach((t) => merged.set(t.id, t))
   const list = Array.from(merged.values())
-
-  return subject === 'numbers'
-    ? list.sort((a, b) => Number(a.id) - Number(b.id))
-    : list.sort((a, b) => a.id.localeCompare(b.id))
+  if (subject === 'numbers') return list.sort((a, b) => Number(a.id) - Number(b.id))
+  if (subject === 'hindi') return list
+  return list.sort((a, b) => a.id.localeCompare(b.id))
 }
 
-export function findTemplate(
-  subject: 'english' | 'numbers',
-  id: string
-): CharacterTemplate | undefined {
+export function findTemplate(subject: TracingSubject, id: string): CharacterTemplate | undefined {
   return getTemplates(subject).find((t) => t.id === id)
 }
