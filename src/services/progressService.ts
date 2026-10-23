@@ -139,8 +139,8 @@ export async function setAudioMuted(muted: boolean): Promise<void> {
   await commit({ ...state, audioMuted: muted })
 }
 
-const AVAILABLE_LETTERS = ['A', 'B', 'C']
-const AVAILABLE_NUMBERS = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+const AVAILABLE_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+const AVAILABLE_NUMBERS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 function evaluateBadges(before: ProgressState, after: ProgressState): BadgeUnlock | null {
   const newlyEarned: string[] = []
