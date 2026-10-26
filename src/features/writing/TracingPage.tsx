@@ -9,7 +9,7 @@ import { recordWritingCompletion, type BadgeUnlock } from '../../services/progre
 import BadgeToast from '../../components/BadgeToast'
 
 interface Props {
-  subject: 'english' | 'numbers'
+  subject: 'english' | 'numbers' | 'hindi'
   charId: string
   onBack: () => void
   onPickChar: (charId: string) => void
@@ -92,7 +92,7 @@ export default function TracingPage({ subject, charId, onBack, onPickChar }: Pro
         <div className="text-center">
           <div className="font-display text-3xl font-extrabold text-ink">{template.label}</div>
           <div className="text-xs font-bold uppercase tracking-wide text-ink/50">
-            {subject === 'english' ? 'English Letters' : 'Numbers'}
+            {subject === 'english' ? 'English Letters' : subject === 'hindi' ? 'Hindi Letters' : 'Numbers'}
           </div>
         </div>
         <div className="w-10" />
@@ -114,7 +114,7 @@ export default function TracingPage({ subject, charId, onBack, onPickChar }: Pro
           guide={guideNode}
           showToolbar
           clipPaths={template.strokes.map((s) => s.d)}
-          clipWidth={30}
+          clipWidth={template.strokeWidth ?? 30}
           lockSize={44}
         />
       </div>
