@@ -89,15 +89,19 @@ export interface BadgeUnlock {
   emoji: string
 }
 
-/** Records one writing-level completion and returns any badge newly unlocked. */
-export async function recordWritingCompletion(subject: 'english' | 'numbers', charId: string): Promise<BadgeUnlock | null> {
+/** Records one writing-level completion and returns any badge newly unlocked.
+ *  English and Hindi letters are both counted in lettersTraced. */
+export async function recordWritingCompletion(
+  subject: 'english' | 'numbers' | 'hindi',
+  charId: string
+): Promise<BadgeUnlock | null> {
   const state = await ensureLoaded()
   const next: ProgressState = {
     ...state,
     writingActivitiesCompleted: state.writingActivitiesCompleted + 1,
     stars: state.stars + 1,
     lettersTraced:
-      subject === 'english' && !state.lettersTraced.includes(charId)
+      subject !== 'numbers' && !state.lettersTraced.includes(charId)
         ? [...state.lettersTraced, charId]
         : state.lettersTraced,
     numbersTraced:
@@ -139,6 +143,7 @@ export async function setAudioMuted(muted: boolean): Promise<void> {
   await commit({ ...state, audioMuted: muted })
 }
 
+// ABC Champion needs every English letter A-Z; Number Star needs every digit 0-9.
 const AVAILABLE_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 const AVAILABLE_NUMBERS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
