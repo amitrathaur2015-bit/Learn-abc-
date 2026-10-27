@@ -14,7 +14,7 @@ async function getSessionParentId(): Promise<string | null> {
   return data.user?.id ?? null
 }
 
-export async function syncWritingCompletion(subject: 'english' | 'numbers', charId: string): Promise<void> {
+export async function syncWritingCompletion(subject: 'english' | 'numbers' | 'hindi', charId: string): Promise<void> {
   const childId = getActiveChildId()
   const parentId = await getSessionParentId()
   if (!childId || !parentId) return
