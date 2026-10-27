@@ -1,10 +1,11 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
 import type { CharacterTemplate } from '../types/tracing'
 import { setExtraTemplates } from '../data/tracingTemplates'
+import { HINDI_STROKE_WIDTH } from '../data/hindiLetters'
 
-/** Loads the published letters/numbers made in the Admin Panel and hands them
- *  to the tracing engine. Templates with no strokes are skipped. If anything
- *  goes wrong the built-in letters/numbers keep working unchanged. */
+/** Loads the published letters/numbers/Hindi letters made in the Admin Panel and
+ *  hands them to the tracing engine. Templates with no strokes are skipped. If
+ *  anything goes wrong the built-in letters keep working unchanged. */
 export async function loadAdminTemplates(): Promise<void> {
   if (!isSupabaseConfigured) return
   try {
@@ -26,7 +27,8 @@ export async function loadAdminTemplates(): Promise<void> {
 
     const result: CharacterTemplate[] = []
     for (const t of templates) {
-      if (t.subject !== 'english' && t.subject !== 'numbers') continue
+      const subject = t.subject as string
+      if (subject !== 'english' && subject !== 'numbers' && subject !== 'hindi') continue
       const strokes = (paths ?? [])
         .filter((p) => p.template_id === t.id)
         .map((p) => ({
@@ -37,9 +39,10 @@ export async function loadAdminTemplates(): Promise<void> {
       if (strokes.length === 0) continue
       result.push({
         id: t.id as string,
-        subject: t.subject as 'english' | 'numbers',
+        subject,
         label: t.label as string,
         difficulty: Number(t.difficulty ?? 1),
+        strokeWidth: subject === 'hindi' ? HINDI_STROKE_WIDTH : undefined,
         strokes
       })
     }
