@@ -37,7 +37,7 @@ export interface WritingSubjectCard {
 
 const WRITING_SUBJECTS: WritingSubjectCard[] = [
   { id: 'english', title: 'English A-Z', emoji: '🔤', color: 'sky', ready: true },
-  { id: 'hindi', title: 'Swar & Vyanjan', emoji: '🅰️', color: 'sun', ready: false },
+  { id: 'hindi', title: 'Swar & Vyanjan', emoji: '🅰️', color: 'sun', ready: true },
   { id: 'numbers', title: 'Numbers', emoji: '🔢', color: 'leaf', ready: true }
 ]
 
