@@ -42,7 +42,7 @@ function ScreenLoading() {
   )
 }
 
-type WritingSubject = 'english' | 'numbers'
+type WritingSubject = 'english' | 'numbers' | 'hindi'
 
 type Screen =
   | { name: 'home' }
@@ -100,7 +100,6 @@ export default function App() {
         <WritingHub
           onBack={goHome}
           onPickSubject={(subject) => {
-            if (subject === 'hindi') return setScreen({ name: 'hindi-hub' })
             setScreen({ name: 'writing-picker', subject })
           }}
         />
