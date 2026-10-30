@@ -2,7 +2,7 @@ import type { CharacterTemplate, StrokeTemplate } from '../types/tracing'
 
 // How far the numbers go (2-digit numbers only: up to 99). Raise this number
 // to add more numbers to Writing Practice.
-export const MAX_NUMBER = 20
+export const MAX_NUMBER = 99
 
 // The digit 0 (the built-in list in tracingTemplates.ts starts at 1).
 export const zeroTemplate: CharacterTemplate = {
