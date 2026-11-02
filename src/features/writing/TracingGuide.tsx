@@ -13,45 +13,62 @@ function startDirection(d: string): number {
 }
 
 /** A big, bold, colorful stencil - like a coloring-book letter. The child
- *  traces inside this shape with their finger. Always in the DOM so the
- *  tracing engine can sample it with getPointAtLength() for the check.
- *  Letters can ask for a thinner stencil (strokeWidth) so small loops stay readable. */
+ *  colours inside this shape with their finger.
+ *  - Letters with an `outline` (Hindi) show the real printed shape of the letter.
+ *  - Other letters are drawn as thick lines along their strokes.
+ *  Either way the stroke paths stay in the page (invisible when an outline is used)
+ *  because the tracing check measures against them with getPointAtLength(). */
 export default function TracingGuide({ template, registerPath }: Props) {
   const first = template.strokes[0]
   const angle = first ? startDirection(first.d) : 0
   const w = template.strokeWidth ?? 30
+  const outline = template.outline
+  const grow = template.outlineGrow ?? 0
 
   return (
     <svg viewBox="0 0 300 300" className="absolute inset-0 h-full w-full" aria-hidden="true">
       <line x1="20" y1="60" x2="280" y2="60" stroke="#2B2140" strokeOpacity="0.08" strokeWidth="2" />
       <line x1="20" y1="240" x2="280" y2="240" stroke="#2B2140" strokeOpacity="0.14" strokeWidth="2" />
 
-      {/* black outline (drawn first, slightly thicker, sits behind the color) */}
-      {template.strokes.map((stroke) => (
-        <path
-          key={`${stroke.id}-outline`}
-          d={stroke.d}
-          fill="none"
-          stroke="#2B2140"
-          strokeWidth={w + 8}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      ))}
+      {outline ? (
+        <>
+          {/* dark rim, then the pink letter on top */}
+          <path d={outline} fill="#2B2140" stroke="#2B2140" strokeWidth={2 * grow + 6} strokeLinejoin="round" />
+          <path d={outline} fill="#FF3D9A" stroke="#FF3D9A" strokeWidth={2 * grow} strokeLinejoin="round" />
+          {template.strokes.map((stroke, i) => (
+            <path key={stroke.id} ref={(el) => registerPath(i, el)} d={stroke.d} fill="none" stroke="none" />
+          ))}
+        </>
+      ) : (
+        <>
+          {/* black outline (drawn first, slightly thicker, sits behind the color) */}
+          {template.strokes.map((stroke) => (
+            <path
+              key={`${stroke.id}-outline`}
+              d={stroke.d}
+              fill="none"
+              stroke="#2B2140"
+              strokeWidth={w + 8}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          ))}
 
-      {/* bold color fill on top */}
-      {template.strokes.map((stroke, i) => (
-        <path
-          key={stroke.id}
-          ref={(el) => registerPath(i, el)}
-          d={stroke.d}
-          fill="none"
-          stroke="#FF3D9A"
-          strokeWidth={w}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      ))}
+          {/* bold color fill on top */}
+          {template.strokes.map((stroke, i) => (
+            <path
+              key={stroke.id}
+              ref={(el) => registerPath(i, el)}
+              d={stroke.d}
+              fill="none"
+              stroke="#FF3D9A"
+              strokeWidth={w}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          ))}
+        </>
+      )}
 
       {/* one arrow showing where and which way to start */}
       {first && (
