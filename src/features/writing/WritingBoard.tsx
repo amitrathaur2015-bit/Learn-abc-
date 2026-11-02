@@ -45,6 +45,11 @@ interface Props {
   clipPaths?: string[]
   /** How thick the clip area is (should match the guide's visual shape width). */
   clipWidth?: number
+  /** A filled letter shape (SVG path) to keep the ink inside. When given, it is
+   *  used instead of clipPaths/clipWidth. */
+  clipOutline?: string
+  /** How much the filled shape is thickened on every side (match the guide). */
+  clipGrow?: number
   /** When set, the brush is a big fixed "fill" size and the S/M/L size
    *  picker is hidden - a small back-and-forth finger motion fills a large
    *  area at once, combined with clipPaths this makes coloring a whole
@@ -53,7 +58,7 @@ interface Props {
 }
 
 const WritingBoard = forwardRef<WritingBoardHandle, Props>(function WritingBoard(
-  { onStrokeEnd, showToolbar = true, guide, clipPaths, clipWidth = 26, lockSize },
+  { onStrokeEnd, showToolbar = true, guide, clipPaths, clipWidth = 26, clipOutline, clipGrow = 0, lockSize },
   ref
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -69,7 +74,8 @@ const WritingBoard = forwardRef<WritingBoardHandle, Props>(function WritingBoard
   // Build the (offscreen, never rendered) clip mask once for this board -
   // a solid copy of the letter shape used to hide any ink outside it.
   useEffect(() => {
-    if (!clipPaths || clipPaths.length === 0) {
+    const hasStrokes = clipPaths && clipPaths.length > 0
+    if (!clipOutline && !hasStrokes) {
       maskCanvasRef.current = null
       return
     }
@@ -80,10 +86,20 @@ const WritingBoard = forwardRef<WritingBoardHandle, Props>(function WritingBoard
     if (mctx) {
       mctx.lineCap = 'round'
       mctx.lineJoin = 'round'
+      mctx.fillStyle = '#000000'
       mctx.strokeStyle = '#000000'
-      mctx.lineWidth = clipWidth
-      for (const d of clipPaths) {
-        mctx.stroke(new Path2D(d))
+      if (clipOutline) {
+        const shape = new Path2D(clipOutline)
+        mctx.fill(shape)
+        if (clipGrow > 0) {
+          mctx.lineWidth = clipGrow * 2
+          mctx.stroke(shape)
+        }
+      } else {
+        mctx.lineWidth = clipWidth
+        for (const d of clipPaths ?? []) {
+          mctx.stroke(new Path2D(d))
+        }
       }
     }
     maskCanvasRef.current = mask
