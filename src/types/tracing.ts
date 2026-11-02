@@ -28,6 +28,8 @@ export interface CharacterTemplate {
   /** 1 = easiest. Reserved for future sequencing/unlock logic. */
   difficulty: number
     strokeWidth?: number
+    outline?: string
+  outlineGrow?: number
 }
 
 export type TracingLevel = 1 | 2 | 3 | 4 | 5
