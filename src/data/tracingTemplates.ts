@@ -1,14 +1,16 @@
 import type { CharacterTemplate } from '../types/tracing'
 import { moreEnglishTemplates } from './moreLetters'
-import { zeroTemplate, getBigNumbers } from './bigNumbers'
 import { hindiTemplates } from './hindiLetters'
+import { numberFontTemplates } from './numberLetters'
 
 // All strokes live on a shared 300x300 grid (matches the SVG viewBox used by
 // TracingGuide and the canvas resolution used by WritingBoard, so a point
 // drawn by the child lines up exactly with the guide path underneath it).
 //
-// To add a new character later (A-Z, Hindi swar/vyanjan, 1-100): add one more
-// entry here. Nothing else in the tracing engine needs to change.
+// Where each list comes from:
+//  - English A, B, C: below. English D to Z: moreLetters.ts
+//  - Hindi swar and vyanjan: hindiLetters.ts
+//  - Numbers 0 to 20: numberLetters.ts (the hand-made 1-9 below are kept only as a spare)
 
 export const englishTemplates: CharacterTemplate[] = [
   {
@@ -182,13 +184,12 @@ export function setExtraTemplates(list: CharacterTemplate[]) {
 export type TracingSubject = 'english' | 'numbers' | 'hindi'
 
 export function getTemplates(subject: TracingSubject): CharacterTemplate[] {
-  const digits = [zeroTemplate, ...numberTemplates]
   const base =
     subject === 'english'
       ? [...englishTemplates, ...moreEnglishTemplates]
       : subject === 'hindi'
       ? hindiTemplates
-      : [...digits, ...getBigNumbers(digits)]
+      : numberFontTemplates
   const merged = new Map<string, CharacterTemplate>(base.map((t) => [t.id, t]))
   extraTemplates.filter((t) => t.subject === subject).forEach((t) => merged.set(t.id, t))
   const list = Array.from(merged.values())
