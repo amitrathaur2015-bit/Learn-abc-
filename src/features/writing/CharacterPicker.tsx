@@ -76,7 +76,7 @@ export default function CharacterPicker({ subject, onBack, onPick }: Props) {
           <CharGrid items={vyanjan} cols={4} onPick={onPick} />
         </>
       ) : (
-        <CharGrid items={chars} cols={3} onPick={onPick} />
+                <CharGrid items={chars} cols={subject === 'numbers' ? 4 : 3} onPick={onPick} />
       )}
 
       <p className="mt-6 text-center text-sm text-ink/40">More letters and numbers are on the way! ✨</p>
