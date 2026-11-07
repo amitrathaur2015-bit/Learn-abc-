@@ -17,6 +17,10 @@ const PEN_SIZES = [
   { name: 'L', value: 18 }
 ]
 
+// The pen colour the child picked last. Kept here (outside the component) because the
+// board is built fresh for every new letter - without this the colour went back to black each time.
+let rememberedColor = PEN_COLORS[0].value
+
 interface Stroke {
   points: Point[]
   color: string
@@ -65,7 +69,7 @@ const WritingBoard = forwardRef<WritingBoardHandle, Props>(function WritingBoard
   const maskCanvasRef = useRef<HTMLCanvasElement | null>(null)
   const [strokes, setStrokes] = useState<Stroke[]>([])
   const [redoStack, setRedoStack] = useState<Stroke[]>([])
-  const [color, setColor] = useState(PEN_COLORS[0].value)
+  const [color, setColor] = useState(rememberedColor)
   const [size, setSize] = useState(lockSize ?? PEN_SIZES[1].value)
   const [eraser, setEraser] = useState(false)
   const drawing = useRef(false)
@@ -232,6 +236,7 @@ const WritingBoard = forwardRef<WritingBoardHandle, Props>(function WritingBoard
               aria-label={`Pen color ${c.name}`}
               onClick={() => {
                 setEraser(false)
+                rememberedColor = c.value
                 setColor(c.value)
               }}
               className={`h-8 w-8 rounded-full border-2 ${
