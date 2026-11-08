@@ -17,9 +17,33 @@ const PEN_SIZES = [
   { name: 'L', value: 18 }
 ]
 
-// The pen colour the child picked last. Kept here (outside the component) because the
-// board is built fresh for every new letter - without this the colour went back to black each time.
-let rememberedColor = PEN_COLORS[0].value
+// The pen colour the child picked last. It is kept outside the component (the board is
+// built fresh for every new letter) and also saved on the phone, so it is still the
+// same colour the next time the app is opened.
+const COLOR_KEY = 'chhota-scholar-pen-color'
+
+function loadSavedColor(): string {
+  try {
+    const saved = localStorage.getItem(COLOR_KEY)
+    if (saved && PEN_COLORS.some((c) => c.value === saved)) return saved
+  } catch {
+    // storage not available - fall back to the first colour
+  }
+  return PEN_COLORS[0].value
+}
+
+function saveColor(value: string) {
+  try {
+    localStorage.setItem(COLOR_KEY, value)
+  } catch {
+    // storage not available - the colour is still remembered until the page is closed
+  }
+}
+
+let rememberedColor = loadSavedColor()
+
+// Light yellow paper behind the letter.
+const BOARD_COLOR = '#FFF6C4'
 
 interface Stroke {
   points: Point[]
@@ -213,7 +237,10 @@ const WritingBoard = forwardRef<WritingBoardHandle, Props>(function WritingBoard
 
   return (
     <div className="w-full">
-      <div className="relative w-full aspect-square rounded-3xl overflow-hidden touch-none select-none bg-white">
+      <div
+        className="relative w-full aspect-square rounded-3xl overflow-hidden touch-none select-none"
+        style={{ backgroundColor: BOARD_COLOR }}
+      >
         {guide}
         <canvas
           ref={canvasRef}
@@ -237,6 +264,7 @@ const WritingBoard = forwardRef<WritingBoardHandle, Props>(function WritingBoard
               onClick={() => {
                 setEraser(false)
                 rememberedColor = c.value
+                saveColor(c.value)
                 setColor(c.value)
               }}
               className={`h-8 w-8 rounded-full border-2 ${
